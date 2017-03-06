@@ -86,12 +86,7 @@ public class MainGui extends JFrame {
 		System.out.println("Starting network...");
 		instance = this;
 
-		// networkTrainer.train(Math.max(6000,
-		// ReadWriteFile.getResourceFileSizes() / 2L));
-
 		trainingDataGenerator = new DigitTrainingDataGenerator("E:\\NeuralNetworkReloaded\\training");
-		// trainingDataGenerator = new SinusTrainingDataGenerator();
-		// trainingDataGenerator = new XorTrainingDataGenerator();
 
 		final Network net = Network.load();
 		if (net == null) {
