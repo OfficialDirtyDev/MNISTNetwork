@@ -73,8 +73,8 @@ public class MainGui extends JFrame {
 	private JLabel info;
 	private static MainGui instance;
 	private final Network network;
-	Backpropagator back;
-	TrainingDataGenerator trainingDataGenerator;
+	private Backpropagator back;
+	private TrainingDataGenerator trainingDataGenerator;
 	private ApplicationFrame chartFrame;
 
 	public static void main(String[] args) {
