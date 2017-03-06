@@ -1,5 +1,11 @@
 package neural;
 
+/**
+ * Basic training class containing an array of example inputs and outputs
+ * @author DirtyDev
+ * Created by DirtyDev on 06.03.2017, 20:34:39
+ *
+ */
 public class TrainingSet {
 
     private double[] inputs;
