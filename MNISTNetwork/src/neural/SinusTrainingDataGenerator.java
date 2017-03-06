@@ -1,5 +1,12 @@
 package neural;
 
+/**
+ * Basic class for a training data generator which will return an array of
+ * inputs(double from 0 up to 2PI) and outputs(double from -1 up to 1)
+ * @author DirtyDev
+ * Created by DirtyDev on 06.03.2017, 20:31:55
+ *
+ */
 public class SinusTrainingDataGenerator implements TrainingDataGenerator {
 
 	@Override
