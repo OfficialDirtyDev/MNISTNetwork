@@ -50,6 +50,9 @@ import neural.Neuron;
 import neural.SigmoidActivationMethod;
 import neural.TrainingDataGenerator;
 
+/**
+ * Main class drawing the main frame
+ */
 public class MainGui extends JFrame {
 
 	private final int RESOLUTION = 28;
