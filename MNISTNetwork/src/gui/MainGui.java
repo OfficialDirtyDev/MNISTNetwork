@@ -12,6 +12,8 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -27,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -56,9 +59,10 @@ import neural.TrainingDataGenerator;
 public class MainGui extends JFrame {
 
 	private final int RESOLUTION = 28;
-	private final int INPUT = 784, HIDDEN = 1200, OUTPUT = 10;
+	private final int INPUT = 784, HIDDEN = 400, OUTPUT = 10;
 	private final int DRAWING_SIZE = 560;
 	private final double ERROR_THRESHOLD = 0.05;
+	private final int NUM_OF_SEQUENCE = 10;
 
 	private JPanel mainPanel;
 	private DrawingPanel drawingPanel;
@@ -88,8 +92,23 @@ public class MainGui extends JFrame {
 		super("Jans Netzwerk");
 		System.out.println("Starting network...");
 		instance = this;
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		setMainPanel();
+		setLeftSide();
+		setCenterArea();
+		setRightSide();
+		setOutputPanel();
+
+		setOnClicks();
+
+		setVisible(true);
+		setSize(new Dimension(1900, 700));
+		setLocationRelativeTo(null);
+
+		createShutdownHooks();
 
 		trainingDataGenerator = new DigitTrainingDataGenerator("E:\\NeuralNetworkReloaded\\training");
+		//trainingDataGenerator = new SinusTrainingDataGenerator();
 
 		final Network net = Network.load();
 		if (net == null) {
@@ -133,36 +152,35 @@ public class MainGui extends JFrame {
 			network.addLayer(hiddenLayer);
 			network.addLayer(outputLayer);
 
+			System.out.println("Created network!");
+			
 		} else {
 			System.out.println("Found existing network!");
 			network = net;
 		}
 
-		back = new Backpropagator(network, 0.013, 0.6, 0);
-		setMainPanel();
-		setLeftSide();
-		setCenterArea();
-		setRightSide();
-		setOutputPanel();
-
-		setOnClicks();
-
-		setVisible(true);
-		setSize(new Dimension(1900, 700));
-		setLocationRelativeTo(null);
-
-		createShutdownHooks();
-
+		back = new Backpropagator(network, 0.02, 0.9, 0);
+		
 	}
 
 	private void createShutdownHooks() {
+		this.addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+				System.out.println("Shutdown");
+				back.cancel(() -> {
+					System.out.println("Saving network...");
+					network.persist();
+				}, true);
+		    }
+		});
+		
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			System.out.println("Shutdown");
 			back.cancel(() -> {
 				System.out.println("Saving network...");
 				network.persist();
-			});
-		}));
+			}, true);
+	    }));
 	}
 
 	private void setMainPanel() {
@@ -231,7 +249,8 @@ public class MainGui extends JFrame {
 		GridBagConstraints down = new GridBagConstraints();
 		centerPanel.add(new JLabel("Training path:    "), down);
 
-		filePath = new JFormattedTextField(new File("").getAbsolutePath());
+		filePath = new JFormattedTextField();
+		filePath.setText(this.getCurrentFileName());
 		filePath.setAlignmentX(Component.CENTER_ALIGNMENT);
 		filePath.setMaximumSize(new Dimension(100, 30));
 		filePath.setPreferredSize(new Dimension(400, 30));
@@ -247,6 +266,10 @@ public class MainGui extends JFrame {
 		centerPanel.add(filePath);
 		mainPanel.add(centerPanel);
 
+	}
+
+	private String getCurrentFileName() {
+		return new File("").getAbsolutePath() + "\\training\\";
 	}
 
 	private void setRightSide() {
@@ -407,7 +430,7 @@ public class MainGui extends JFrame {
 				f.pack();
 				f.setVisible(true);
 				chartFrame = f;
-				back.train(errorSeries, averageSeries, trainingDataGenerator, ERROR_THRESHOLD, 5);
+				back.train(errorSeries, averageSeries, trainingDataGenerator, ERROR_THRESHOLD, NUM_OF_SEQUENCE);
 			}).start();
 		});
 

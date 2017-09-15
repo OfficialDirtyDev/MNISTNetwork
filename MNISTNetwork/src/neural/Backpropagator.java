@@ -14,7 +14,7 @@ public class Backpropagator {
 	private double momentum;
 	private double characteristicTime;
 	private double currentEpoch;
-	private boolean running = true;
+	private boolean running = false;
 	private Runnable afterTraining;
 
 	public Backpropagator(Network neuralNetwork, double learningRate, double momentum, double characteristicTime) {
@@ -35,7 +35,7 @@ public class Backpropagator {
 			double errorThreshold, int sequenceLength) {
 		System.out.println("Starting training with errorThreshold = " + errorThreshold);
 		int epoch = 0;
-
+		running = true;
 		if (errorSeries != null) {
 			errorSeries.add(0, 1);
 		}
@@ -69,14 +69,35 @@ public class Backpropagator {
 			System.out.println("Error for epoch " + epoch + ": " + error + ", Average: " + average);
 		} while (average > errorThreshold && running);
 		System.out.println("After backpropagation, last error = " + err + ", last average = " + average);
-		if (afterTraining != null)
-			afterTraining.run();
-		running = true;
+		if (this.afterTraining != null) {
+			this.afterTraining.run();
+			this.afterTraining = null;
+		}
+		running = false;
 	}
 
 	public void cancel(Runnable afterTraining) {
-		this.afterTraining = afterTraining;
+		cancel(afterTraining, false);
+	}
+
+	public void cancel(Runnable finished, boolean shutdown) {
+		System.out.println("Cancelling training, shutdown " + shutdown);
+		if(!running) {
+			System.out.println("!running");
+			this.neuralNetwork.persist();
+			System.exit(0);
+		}
+		
+		this.afterTraining = (() -> {
+			System.out.println("Running afterTraining");
+			finished.run();
+			if (shutdown) {
+				System.out.println("Finally exiting");
+				System.exit(0);
+			}
+		});
 		running = false;
+		System.out.println("SETT");
 	}
 
 	public double backpropagate(double[][] inputs, double[][] expectedOutputs) {

@@ -205,7 +205,7 @@ public class Network implements Serializable {
 		};
 		File[] files = f.listFiles(filter);
 		if (files == null) {
-			
+
 			return null;
 		}
 		File biggest = null;
@@ -213,30 +213,30 @@ public class Network implements Serializable {
 		for (File file : files) {
 			String name = file.getName().replaceAll("\\D+", "");
 			long date = Long.parseLong(name);
-			if(date > biggestDate) {
+			if (date > biggestDate) {
 				biggestDate = date;
 				biggest = file;
 			}
 		}
-		if(biggest == null || biggestDate == -1L) {
+		if (biggest == null || biggestDate == -1L) {
 			return null;
 		}
 		Network network = null;
-	    try {
-	      FileInputStream fileIn = new FileInputStream(biggest.getName());
-	      ObjectInputStream in = new ObjectInputStream(fileIn);
-	      network = (Network) in.readObject();
-	      in.close();
-	      fileIn.close();
-	    } catch (IOException i) {
-	      i.printStackTrace();
-	      return null;
-	    } catch (ClassNotFoundException c) {
-	      System.out.println("Network class not found");
-	      c.printStackTrace();
-	      return null;
-	    }
-	    return network;
+		try {
+			FileInputStream fileIn = new FileInputStream(biggest.getName());
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			network = (Network) in.readObject();
+			in.close();
+			fileIn.close();
+		} catch (IOException i) {
+			i.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException c) {
+			System.out.println("Network class not found");
+			c.printStackTrace();
+			return null;
+		}
+		return network;
 	}
 
 }
